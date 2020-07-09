@@ -16,25 +16,25 @@ var data
 var classData = []
 let classInfo = []
 function start() {
-    let username = ""
-    let password = ""
-    const rl = readline.createInterface({
-        input:process.stdin,
-        output:process.stdout
-    });
-    console.log("请输入账号密码（用空格分开，账号只能手机号）")
-    rl.on("line",(line)=>{
-        let arr = line.split(" ")
-        username = arr[0]
-        password = arr[1]
-        if(checkPhone(username))
-            console.log("手机号输入错误请重新输入")
-        else
-            rl.close();
-    })
-    rl.on("close",()=>{
+    let username = "替换成你注册学习通用的手机号"
+    let password = "替换成你的密码"
+//     const rl = readline.createInterface({
+//         input:process.stdin,
+//         output:process.stdout
+//     });
+//     console.log("请输入账号密码（用空格分开，账号只能手机号）")
+//     rl.on("line",(line)=>{
+//         let arr = line.split(" ")
+//         username = arr[0]
+//         password = arr[1]
+//         if(checkPhone(username))
+//             console.log("手机号输入错误请重新输入")
+//         else
+//             rl.close();
+//     })
+//     rl.on("close",()=>{
         getUid(username,password)
-    })
+//     })
 }
 function getUid(username,password){
     let options = {
@@ -122,33 +122,34 @@ addData = function(){
     }
 
     console.log("请输入要选择的课程id(用英文逗号分隔)：")
-    const rl = readline.createInterface({
-        input:process.stdin,
-        output:process.stdout
-    });
-    rl.on("line",(line)=>{
-        let classId = [];
+    console.log("选择成功后，弹出的数次签到失败是程序在遍历该课程所有的签到活动；只要30秒后开始出现\"正在监控签到活动\"就没有问题。")
+//     const rl = readline.createInterface({
+//         input:process.stdin,
+//         output:process.stdout
+//     });
+//     rl.on("line",(line)=>{
+        let classId = [/*手动运行过一次后将要监控的课程编号写入这里，格式如下：['0','1','2',...]*/];
         //console.log(line)
-        let suc = line.split(",").every(function(elem, index, arr){
-            return elem == parseInt(elem)
-        })
-        if (suc){
-            line.split(",").forEach(function(el){
-                this.push(parseInt(el))
-            },classId)
+//         let suc = line.split(",").every(function(elem, index, arr){
+//             return elem == parseInt(elem)
+//         })
+//         if (suc){
+//             line.split(",").forEach(function(el){
+//                 this.push(parseInt(el))
+//             },classId)
             console.log("选择成功")
             for(let i of classId){
                 classInfo.push(classData[i])
             }
-            //console.log(classInfo)
-            rl.close();
-        }else{
-            console.log("选择失败,请重新选择")
-        }
-    })
-    rl.on("close",()=>{
+//             //console.log(classInfo)
+//             rl.close();
+//         }else{
+//             console.log("选择失败,请重新选择")
+//         }
+//     })
+//     rl.on("close",()=>{
         startSign()
-    })
+//     })
 
 
 }
@@ -174,10 +175,11 @@ startSign = function(){
 
 }
 async function opGet(ops) {
+    let sign_count = 0
     while (1){
         let check = 1
+        await sleep(30000)//这里调查询的间隔时间
         for (let i = 0;i<ops.length;i++){
-            await sleep(10000)//这里调查询的间隔时间
             let bufferData=[]
             http.get(ops[i],function (res) {
                 res.on("data",function (chunk) {
@@ -188,10 +190,10 @@ async function opGet(ops) {
                     let activeList=buffer.activeList
                     //console.log(activeList)
                     if (activeList!=undefined){
-
+                        
                         for (let i = 0;i<activeList.length;i++){
                             if (activeList[i].nameTwo ==undefined)
-                                continue
+                            	continue
                             //console.log(1)
                             if ((activeList[i].activeType==2 &&activeList[i].status==1)||(activeList[i].activeType==2 &&activeList[i].status==2))
                             {
@@ -206,11 +208,13 @@ async function opGet(ops) {
                             }
                         }
                     }
-                    if(check)
-                        console.log("未查询到签到")
+                    if(check){
+                        console.log("【正在监控签到活动" + sign_count + "】 :" + "未查询到签到")
+                        sign_count++
+                    }
                 })
             })
-        }     
+        }       
     }
 }
 function sign(aid,uid) {
