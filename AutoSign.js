@@ -1,3 +1,6 @@
+//Authors: ZQA&&PBY
+//Js脚本，在服务器端使用mp2管理nodejs运行。
+
 var http = require('http');
 var readline = require('readline');
 let headers={
